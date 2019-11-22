@@ -24,6 +24,12 @@ class PrometheusExporter::Middleware
         MethodProfiler.patch(Mysql2::Statement, [:execute], :sql)
         MethodProfiler.patch(Mysql2::Result, [:each], :sql)
       end
+      if defined? Searchkick::Query
+        MethodProfiler.patch(Searchkick::Query, [:execute], :elasticsearch)
+      end
+      if defined? Dalli::Client
+        MethodProfiler.patch(Dalli::Client, [:add, :replace, :set, :delete, :append, :prepend, :flush, :incr, :decr], :memcache)
+      end
     end
   end
 

@@ -47,6 +47,16 @@ module PrometheusExporter::Server
           "http_queue_duration_seconds",
           "Time spent queueing the request in load balancer in seconds."
         )
+	@metrics["http_elasticsearch_duration_seconds"] = @http_elasticsearch_duration_seconds = PrometheusExporter::Metric::Summary.new(
+          "http_elasticsearch_duration_seconds",
+          "Time spent in HTTP reqs in ES in seconds."
+        )
+	@metrics["http_memcache_duration_seconds"] = @http_memcache_duration_seconds = PrometheusExporter::Metric::Summary.new(
+          "http_memcache_duration_seconds",
+          "Time spent in HTTP reqs in memcache in seconds."
+        )
+
+
       end
     end
 
@@ -68,6 +78,13 @@ module PrometheusExporter::Server
         if sql = timings["sql"]
           @http_sql_duration_seconds.observe(sql["duration"], labels)
         end
+	if elasticsearch = timings["elasticsearch"]
+          @http_elasticsearch_duration_seconds.observe(elasticsearch["duration"], labels)
+        end
+        if memcache = timings["memcache"]
+          @http_memcache_duration_seconds.observe(memcache["duration"], labels)
+        end
+
       end
       if queue_time = obj["queue_time"]
         @http_queue_duration_seconds.observe(queue_time, labels)
